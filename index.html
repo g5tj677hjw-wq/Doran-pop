@@ -38,7 +38,7 @@
 .archive-images{display:grid;gap:12px;clear:both}
 .archive-images button{display:block;background:none;border:0;padding:0;width:100%}
 .archive-images img{display:block;width:100%;height:auto;border-radius:8px}
-.english-translation{display:block;margin-top:7px;padding-top:6px;border-top:1px solid #A3B18A;color:#2D5A27;font-size:.9em}
+.chinese-translation{display:block;margin-top:7px;padding-top:6px;border-top:1px solid #A3B18A;color:#2D5A27;font-size:.92em;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
 #translationStatus{margin:10px 0 0}
 @font-face{font-family:"Gowun Dodum";src:url(fonts/gowun-dodum-ui.woff) format("woff");font-style:normal;font-weight:400;font-display:swap}
 :root{--ui-font:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
@@ -191,7 +191,7 @@ body{background:#f0f2ee}
 <dialog class="sheet" id="heartDialog" aria-labelledby="heartTitle"><button class="close" data-close="heartDialog" aria-label="닫기">×</button><h1 id="heartTitle">하트 모아보기</h1><div id="heartList"></div></dialog>
 <dialog class="sheet pop-bottom-sheet" id="settings"><div class="sheet-handle"></div><button class="close" data-close="settings" aria-label="닫기">×</button><div class="profile-card"><button id="profilePhoto" aria-label="프로필 사진 확대"><img src="avatar.png" alt=""></button><h1>최현준임</h1><small id="profileDays"></small></div><div class="profile-library"><span>보관함</span><button id="openMediaMini">전체보기</button></div><div id="mediaStrip"></div><button class="menu" id="changeName">닉네임 변경</button><button class="menu" id="openHearts">하트 모아보기</button><button class="menu" id="language">번역 설정</button><button class="menu" id="openMedia">사진 · 영상</button><button class="menu" id="openProfiles">프로필 사진</button><button class="menu" id="openBackgrounds">배경 사진</button></dialog>
 <dialog class="sheet" id="dates"><button class="close" data-close="dates" aria-label="닫기">×</button><h1>달력</h1><div class="calnav"><button id="prevMonth" aria-label="이전 달">‹</button><div class="calendar-selectors"><select id="calendarYear" aria-label="연도"></select><select id="calendarMonth" aria-label="월"></select></div><button id="nextMonth" aria-label="다음 달">›</button></div><div class="week"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div id="calendar"></div><p id="calendarHint">점이 있는 날짜를 누르면 그날 대화로 이동합니다.</p><button class="primary" id="jumpLatest" type="button">마지막 팝으로</button></dialog>
-<dialog class="sheet" id="searchDialog"><button class="close" data-close="searchDialog" aria-label="닫기">×</button><h1>대화 검색</h1><input id="query" aria-label="검색어" placeholder="검색어 입력" autocomplete="off"><p id="resultCount" aria-live="polite"></p><div id="searchResults"></div></dialog><dialog class="sheet" id="translation"><button class="close" data-close="translation" aria-label="닫기">×</button><h1>번역 설정</h1><p id="translationIntro">한국어 원문 아래에 영어 번역을 표시합니다.</p><p id="translationHelp" hidden>이 브라우저에서는 말풍선 아래 자동 번역을 지원하지 않아요. 아이폰 Safari에서는 주소창 왼쪽의 페이지 메뉴에 ‘영어로 번역’이 표시될 때 페이지 전체를 번역할 수 있어요.</p><button class="primary" id="toggleEnglish" type="button" aria-pressed="false">영어 자동 번역 켜기</button><p id="translationStatus" aria-live="polite"></p></dialog>
+<dialog class="sheet" id="searchDialog"><button class="close" data-close="searchDialog" aria-label="닫기">×</button><h1>대화 검색</h1><input id="query" aria-label="검색어" placeholder="검색어 입력" autocomplete="off"><p id="resultCount" aria-live="polite"></p><div id="searchResults"></div></dialog><dialog class="sheet" id="translation"><button class="close" data-close="translation" aria-label="닫기">×</button><h1>번역 설정</h1><p id="translationIntro">韩文原文下方显示简体中文翻译，原文会完整保留。</p><p id="translationHelp" hidden>首次翻译需要联网；已翻译内容会缓存在此浏览器中。</p><button class="primary" id="toggleEnglish" type="button" aria-pressed="false">开启中文自动翻译</button><p id="translationStatus" aria-live="polite"></p></dialog>
 <dialog class="sheet" id="mediaDialog" aria-labelledby="mediaTitle"><header class="media-header"><h1 id="mediaTitle">사진 · 영상</h1><button class="close" data-close="mediaDialog" aria-label="사진·영상 목록 닫기">×</button></header><div class="media-scroll"><div id="gallery"></div></div></dialog>
 <dialog class="sheet" id="archiveDialog"><button class="close" data-close="archiveDialog" aria-label="닫기">×</button><h1 id="archiveTitle"></h1><div class="archive-images" id="archiveImages"></div></dialog>
 <dialog id="viewer"><button class="close" data-close="viewer" aria-label="사진·영상 보기 닫기">×</button><div id="viewerContent"></div></dialog>
@@ -253,10 +253,9 @@ function render(){
 }
 for(const n of document.querySelectorAll('[data-close]'))n.onclick=()=>$('#'+n.dataset.close).close();$('#viewer').addEventListener('close',()=>{const v=$('#viewer video');if(v)v.pause()});
 $('#profile').onclick=()=>$('#settings').showModal();$('#language').onclick=()=>{
- const supported=typeof globalThis.Translator?.create==='function';
- $('#translationIntro').hidden=!supported;
- $('#toggleEnglish').hidden=!supported;
- $('#translationHelp').hidden=supported;
+ $('#translationIntro').hidden=false;
+ $('#toggleEnglish').hidden=false;
+ $('#translationHelp').hidden=true;
  $('#settings').close();
  $('#translation').showModal();
 };$('#changeName').onclick=()=>{$('#settings').close();showHome();$('#name').focus()};$('#openDates').onclick=()=>$('#dates').showModal();
@@ -455,16 +454,32 @@ $('#toggleStickers').onclick=()=>{
 };
 const translationButton=$('#toggleEnglish');
 const translationStatus=$('#translationStatus');
-const translationOptions={sourceLanguage:'ko',targetLanguage:'en'};
-let translator;
 let translationObserver;
-let englishEnabled=false;
+let chineseEnabled=false;
 let translationRun=0;
-const englishCache=new Map();
+const chineseCache=new Map();
+try{
+ const saved=JSON.parse(localStorage.getItem('doran-pop-zh-cache')||'{}');
+ Object.entries(saved).forEach(([key,value])=>chineseCache.set(key,value));
+}catch{}
 
+async function requestChineseTranslation(original){
+ if(chineseCache.has(original))return chineseCache.get(original);
+ const endpoint='https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=zh-CN&dt=t&q='+encodeURIComponent(original);
+ const response=await fetch(endpoint);
+ if(!response.ok)throw new Error('Translation service unavailable');
+ const data=await response.json();
+ const translated=Array.isArray(data?.[0])?data[0].map(part=>part?.[0]||'').join('').trim():'';
+ if(!translated)throw new Error('Empty translation');
+ chineseCache.set(original,translated);
+ try{
+  localStorage.setItem('doran-pop-zh-cache',JSON.stringify(Object.fromEntries([...chineseCache.entries()].slice(-500))));
+ }catch{}
+ return translated;
+}
 function watchTranslations(){
  translationObserver?.disconnect();
- if(!englishEnabled)return;
+ if(!chineseEnabled)return;
  const run=translationRun;
  translationObserver=new IntersectionObserver(entries=>{
   for(const entry of entries){
@@ -474,57 +489,46 @@ function watchTranslations(){
   }
  },{root:$('#chat'),rootMargin:'120px 0px'});
  for(const bubble of $('#chat').querySelectorAll('.bubble:not(.reply), .reply .answer > span:last-child')){
-  if(!bubble.querySelector('.english-translation'))translationObserver.observe(bubble);
+  if(!bubble.querySelector('.chinese-translation'))translationObserver.observe(bubble);
  }
 }
 async function translateBubble(bubble,run){
  const original=bubble.textContent.trim();
- if(!original)return;
+ if(!original||!/[가-힣]/.test(original))return;
  try{
-  if(!englishCache.has(original)){
-   const result=translator.translate(original).catch(error=>{
-    englishCache.delete(original);
-    throw error;
-   });
-   englishCache.set(original,result);
-  }
-  const text=await englishCache.get(original);
-  if(!englishEnabled||translationRun!==run||!bubble.isConnected||!text||text===original)return;
-  const english=el('span','english-translation',text);
-  english.lang='en';
-  bubble.append(english);
+  const text=await requestChineseTranslation(original);
+  if(!chineseEnabled||translationRun!==run||!bubble.isConnected||!text||text===original)return;
+  const chinese=el('span','chinese-translation',text);
+  chinese.lang='zh-CN';
+  bubble.append(chinese);
  }catch{
-  translationStatus.textContent='일부 메시지를 번역하지 못했습니다.';
+  translationStatus.textContent='部分消息暂时无法翻译，请检查网络后重试。';
  }
 }
 translationButton.onclick=async()=>{
- if(englishEnabled){
-  englishEnabled=false;
+ if(chineseEnabled){
+  chineseEnabled=false;
   translationRun++;
   translationObserver?.disconnect();
-  document.querySelectorAll('.english-translation').forEach(node=>node.remove());
+  document.querySelectorAll('.chinese-translation').forEach(node=>node.remove());
   translationButton.setAttribute('aria-pressed','false');
-  translationButton.textContent='영어 자동 번역 켜기';
+  translationButton.textContent='开启中文自动翻译';
   translationStatus.textContent='';
-  return;
- }
- if(!('Translator' in globalThis)){
-  translationStatus.textContent='이 브라우저는 기기 내 자동 번역을 지원하지 않습니다.';
   return;
  }
  translationButton.disabled=true;
- translationStatus.textContent='영어 번역을 준비하고 있습니다.';
+ translationStatus.textContent='正在连接在线翻译服务…';
  try{
-  if(!translator)translator=await Translator.create(translationOptions);
-  englishEnabled=true;
+  await requestChineseTranslation('안녕하세요');
+  chineseEnabled=true;
   translationRun++;
   translationButton.setAttribute('aria-pressed','true');
-  translationButton.textContent='영어 자동 번역 끄기';
-  translationStatus.textContent='';
+  translationButton.textContent='关闭中文自动翻译';
+  translationStatus.textContent='中文翻译已开启，滚动消息即可逐条显示译文。';
   watchTranslations();
   $('#translation').close();
  }catch{
-  translationStatus.textContent='이 브라우저에서 한국어 → 영어 번역을 시작할 수 없습니다.';
+  translationStatus.textContent='暂时无法连接翻译服务，请检查网络后重试。';
  }finally{
   translationButton.disabled=false;
  }
